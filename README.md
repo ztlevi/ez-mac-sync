@@ -32,9 +32,9 @@ A `.ezmacsyncrc` file will be created under your HOME directory. You can put app
 ```json
 {
   "cloudDir": "Dropbox/AppList",
-  "brewIgnoreList": [],
-  "masIgnoreList": ["Final Cut Pro", "Compressor", "Motion", "Logic Pro X", "MainStage 3"],
-  "brewCaskIgnoreList": ["eclipse-jee", "android-studio", "gitkraken"]
+  "brewRemoveList": [],
+  "masRemoveList": ["Final Cut Pro", "Compressor", "Motion", "Logic Pro X", "MainStage 3"],
+  "brewCaskRemoveList": ["eclipse-jee", "android-studio", "gitkraken"]
 }
 ```
 
