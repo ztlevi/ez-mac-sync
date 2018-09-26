@@ -1,6 +1,4 @@
-# EZ-MAC-SYNC
-
-![img](https://ws4.sinaimg.cn/large/006tNc79ly1fvnl5k0owzj308d08ajr8.jpg)
+# EZ-MAC-SYNC ☁️
 
 This is a simple script helps people sync their applications across all their mac devices easily.
 
