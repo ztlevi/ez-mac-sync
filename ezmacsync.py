@@ -134,6 +134,6 @@ if __name__ == "__main__":
     mas_apps_need_removal = map(lambda app: app[1], mas_apps_need_removal)
     if mas_apps_need_removal:
         print('\nYou might need to remove {} manually.'.format(
-            ' '.join(mas_apps_need_removal)))
+            ','.join(mas_apps_need_removal)))
 
     print('\n================ Install End =================')
