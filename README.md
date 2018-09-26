@@ -1,5 +1,11 @@
 # EZ-MAC-SYNC
 
+<figure style="position:absolute;right:0px;width:10%;text-align:center;">
+<img src="https://ws4.sinaimg.cn/large/006tNc79ly1fvnl5k0owzj308d08ajr8.jpg" alt=""/>
+</figure>
+
+This is a simple script helps people sync their applications across all their mac devices easily.
+
 ## Prerequisites
 
 1. [Homebrew](https://brew.sh/)
