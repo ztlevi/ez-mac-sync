@@ -13,7 +13,7 @@ def create_file_if_not_exist(file, initial_data=None):
     if not os.path.exists(file):
         with open(file, 'w+') as f:
             if initial_data:
-                json.dump(initial_data, f, indent=2)
+                json.dump(initial_data, f, indent=2, separators=(',', ':'))
 
 
 if __name__ == "__main__":
@@ -33,7 +33,7 @@ if __name__ == "__main__":
         ignore_lists['cloudDir'] = cloud_path
     cloud_path = ignore_lists['cloudDir']
     with open(ignore_lists_file, 'w+') as f:
-        json.dump(ignore_lists, f, indent=2)
+        json.dump(ignore_lists, f, indent=2, separators=(',', ':'))
 
     cloud_dir = home + '/' + cloud_path
     if not os.path.isdir(cloud_dir):
@@ -52,7 +52,9 @@ if __name__ == "__main__":
 
     # backup /Applications
     print('Backup /Applications...')
-    all_apps = list(set(os.listdir('/Applications'))
+    all_apps = filter(lambda app: not app.startswith('.'),
+                      os.listdir('/Applications'))
+    all_apps = list(set(all_apps)
                     | set(synced_lists["allAppList"]))
     synced_lists["allAppList"] = all_apps
 
@@ -100,7 +102,7 @@ if __name__ == "__main__":
     synced_lists['masAppList'] = mas_apps
 
     with open(synced_lists_file, 'w+') as f:
-        json.dump(synced_lists, f, indent=2)
+        json.dump(synced_lists, f, indent=2, separators=(',', ':'))
 
     print('================ Backup End ================')
 
