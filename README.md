@@ -33,12 +33,13 @@ A `.ezmacsyncrc` file will be created under your HOME directory. You can put app
 {
   "cloudDir": "Dropbox/AppList",
   "brewRemoveList": [],
+  "brewTapRemoveList": [],
   "masRemoveList": ["Final Cut Pro", "Compressor", "Motion", "Logic Pro X", "MainStage 3"],
   "brewCaskRemoveList": ["eclipse-jee", "android-studio", "gitkraken"]
 }
 ```
 
-> **Note**: `mas` applications will not be removed from your mac because `mas` cannot uninstall apps, but it will notify you the apps you might need to manually uninstall.
+> **Note**: `mas` applications will not be removed from your mac because `mas` cannot uninstall apps, but it will notify you the apps you might need to manually uninstall. For example, I always put `Final Cut Pro` in `masRemoveList` because I don't need it installed in every device.
 
 ## Upgrading Apps
 
