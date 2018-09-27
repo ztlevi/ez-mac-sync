@@ -9,56 +9,90 @@ import os
 import subprocess
 
 
-def create_file_if_not_exist(file, initial_data=None):
-    if not os.path.exists(file):
-        with open(file, 'w+') as f:
-            if initial_data:
-                json.dump(initial_data, f, indent=2, separators=(',', ':'))
-
-
 if __name__ == "__main__":
     home = os.path.expanduser("~")
 
-    # get ignore_lists configs
+    # region get ignore_lists configs
     ignore_lists_file = home + '/.ezmacsyncrc'
-    initial_ignore_lists = {"cloudDir": "", "brewRemoveList": [
-    ], "brewCaskRemoveList": [], "masRemoveList": []}
-    create_file_if_not_exist(ignore_lists_file, initial_ignore_lists)
-    with open(ignore_lists_file) as f:
-        ignore_lists = json.load(f)
-        print("ignore_lists.json file loaded...")
+    ignore_lists = {}
+    if not os.path.exists(ignore_lists_file):
+        open(ignore_lists_file, 'w+')
+        print("ignore_lists.json file created...")
+    else:
+        with open(ignore_lists_file) as f:
+            ignore_lists = json.load(f)
+            print("ignore_lists.json file loaded...")
+
+    # make sure every key exists in ignore list config file
     if 'cloudDir' not in ignore_lists or not ignore_lists['cloudDir']:
         cloud_path = raw_input(
             'Input your cloud directory relative to $HOME for syncing...\ne.g. Dropbox/AppList\n')
         ignore_lists['cloudDir'] = cloud_path
-    cloud_path = ignore_lists['cloudDir']
-    with open(ignore_lists_file, 'w+') as f:
-        json.dump(ignore_lists, f, indent=2, separators=(',', ':'))
-
-    cloud_dir = home + '/' + cloud_path
+    cloud_dir = home + '/' + ignore_lists['cloudDir']
     if not os.path.isdir(cloud_dir):
         os.makedirs(cloud_dir)
 
-    # get synced_lists data
+    ignore_keys = ['brewTapRemoveList', 'brewRemoveList',
+                   'brewCaskRemoveList', 'masRemoveList']
+    for key in ignore_keys:
+        if key not in ignore_lists:
+            ignore_lists[key] = []
+
+    # dump ignore_lists
+    with open(ignore_lists_file, 'w+') as f:
+        json.dump(ignore_lists, f, indent=2, separators=(',', ':'))
+    # endregion
+
+    # region get synced_lists data
     synced_lists_file = cloud_dir + "/synced_lists.json"
-    initial_synced_lists = {"allAppList": [], "brewAppList": [
-    ], "brewCaskAppList": [], "masAppList": []}
-    create_file_if_not_exist(synced_lists_file, initial_synced_lists)
-    with open(synced_lists_file) as f:
-        synced_lists = json.load(f)
-        print('synced_lists.json file loaded...')
+    synced_lists = {}
+    if not os.path.exists(synced_lists_file):
+        open(synced_lists_file, 'w+')
+        print('synced_lists.json file created...')
+    else:
+        with open(synced_lists_file) as f:
+            synced_lists = json.load(f)
+            print('synced_lists.json file loaded...')
+
+    # make sure every key exists in synced_lists
+    synced_keys = ["allAppList", "brewTapList", "brewAppList",
+                   "brewCaskAppList", "masAppList"]
+    for key in synced_keys:
+        if key not in synced_lists:
+            synced_lists[key] = []
+
+    # dump synced_lists
+    with open(synced_lists_file, 'w+') as f:
+        json.dump(synced_lists, f, indent=2, separators=(',', ':'))
 
     print('================ Backup Start ================')
+    # endregion
 
-    # backup /Applications
+    # region backup /Applications
     print('Backup /Applications...')
     all_apps = filter(lambda app: not app.startswith('.'),
                       os.listdir('/Applications'))
     all_apps = list(set(all_apps)
                     | set(synced_lists["allAppList"]))
     synced_lists["allAppList"] = all_apps
+    # endregion
 
-    # backup brew apps
+    # update brew
+    os.system('/usr/local/bin/brew update')
+
+    # region backup brew tap
+    print('Backup brew taps...')
+    brew_taps = subprocess.check_output(
+        '/usr/local/bin/brew tap', shell=True).strip('\n').split('\n')
+    brew_taps = list(set(brew_taps) | set(synced_lists['brewTapList']))
+    brew_taps_ignore_set = set(
+        map(lambda tap: tap.lower(), ignore_lists['brewTapRemoveList']))
+    brew_taps = filter(lambda app: app.lower()
+                       not in brew_taps_ignore_set, brew_taps)
+    synced_lists['brewTapList'] = brew_taps
+    # endregion
+
+    # region backup brew apps
     print('Backup brew apps...')
     brew_apps = subprocess.check_output(
         '/usr/local/bin/brew list', shell=True).strip('\n').split('\n')
@@ -68,8 +102,9 @@ if __name__ == "__main__":
     brew_apps = filter(lambda app: app.lower()
                        not in brew_ignore_set, brew_apps)
     synced_lists['brewAppList'] = brew_apps
+    # endregion
 
-    # backup brew cask apps
+    # region backup brew cask apps
     print('Backup brew cask apps...')
     brew_cask_apps = subprocess.check_output(
         '/usr/local/bin/brew cask list', shell=True).strip('\n').split('\n')
@@ -80,8 +115,9 @@ if __name__ == "__main__":
     brew_cask_apps = filter(lambda app: app.lower(
     ) not in brew_cask_ignore_set, brew_cask_apps)
     synced_lists['brewCaskAppList'] = brew_cask_apps
+    # endregion
 
-    # backup mas apps
+    # region backup mas apps
     print('Backup mas apps...')
     mas_apps = subprocess.check_output(
         '/usr/local/bin/mas list', shell=True).strip('\n').split('\n')
@@ -103,6 +139,7 @@ if __name__ == "__main__":
 
     with open(synced_lists_file, 'w+') as f:
         json.dump(synced_lists, f, indent=2, separators=(',', ':'))
+    # endregion
 
     print('================ Backup End ================')
 
